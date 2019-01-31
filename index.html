@@ -28,30 +28,29 @@
     <script src="app.js"></script>
   </head>
   <body>
-    <div class="container" id="app">
+    <div class="container-fluid" id="app">
       <div class="row">
-        <div class="col">
-          <table class="table table-hover table-borderless">
-            <thead class="thead-dark">
-              <tr>
-                <th class="col-8">Products</th>
-                <th class="col-2">#</th>
-                <th class="col-2">$</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr class="text-center"
-                v-for="n in 10">
-                <td>A</td>
-                <td>b</td>
-                <td>C</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <table class="table table-hover table-borderless">
+          <thead class="thead-dark">
+            <tr>
+              <th class="">Products</th>
+              <th class="text-center">#</th>
+              <th class="text-center">$</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="product in products"
+              ::key="product.id"
+            >
+              <td>{{ product.name }}</td>
+              <td class="text-center">{{ product.quantity }}</td>
+              <td class="text-center">{{ Math.floor(product.price * 100) / 100 }}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
       <div class="row">
-        <div class="col-11">
+        <div class="col-10">
           <div class="form-group">
             <input type="text"
               class="form-control"
@@ -59,7 +58,7 @@
             >
           </div>
         </div>
-        <div class="col-1">
+        <div class="col-2 text-center">
           <button class="btn btn-default">
               <i class="fas fa-ellipsis-v"></i>
           </button>

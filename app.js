@@ -8,11 +8,13 @@ $(document).ready(() => {window['APP'] = new Vue({
   },
   created() {
     $.ajax({
-      url: './api/index.php',
-      method: 'GET'
-      //data: {}
+      url: './api/product.php',
+      dataType: 'json',
     }).done(r => {
-      console.log(r);
+      if(!r.error)
+        APP.$data.products = r;
+      else
+        console.error(r);
     })
   }
 })})
