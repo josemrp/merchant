@@ -2,7 +2,7 @@
 
 // session_start();
 // if($_SESSION['login'] !== true)
-//     exit;
+//     exit();
 
 function getRequest() {
     $data = (object) $_REQUEST;
@@ -14,7 +14,7 @@ function apiResponse($data) {
     echo json_encode($data);
     if(isset($conn))
         $conn->close();
-    die;
+    exit();
 }
 
 $request = getRequest();

@@ -2,20 +2,34 @@
 
 require_once('functions.php');
 
+function is_valid($data) {
+  if (!isset($data->name) || strlen($data->name) < 3)
+    apiResponse((object)['error' => 'Specify the name, please']);
+  //if ($data->price < 0)
+  //  apiResponse((object)['error' => 'Invalid price']);
+  if (strlen($data->name) > 30)
+    apiResponse((object)['error' => 'The name can not have more than 30 characters']);
+  if (isset($data->quantity) && $data->quantity < 0)
+    apiResponse((object)['error' => 'Invalid quantity']);
+  if(isset($data->type) && !in_array($data->type, ['protein','carbohydrate','grease','vitamin']))
+    apiResponse((object)['error' => 'The type must be '."'protein', 'carbohydrate', 'grease' or 'vitamin'"]);
+  return true;
+}
+
 $num_prices = 5;
 
 switch ($request->method) {
   case 'GET':
-    if(isset($request->id)) {
+    if (isset($request->id)) {
       // Get one
       $sql = 'SELECT product.*, price.price, price.inserted_at AS price_inserted
-              FROM product JOIN price ON product.id = price.fk_product
-              WHERE product.id = '. $conn->real_escape_string($request->id);
+              FROM product LEFT JOIN price ON product.id = price.fk_product
+              WHERE product.id = ' . $conn->real_escape_string($request->id);
       $result = $conn->query($sql);
 
       $product = [];
       while ($p = $result->fetch_object()) {
-        $product[$p->id] = $p;
+        $product[] = $p;
       }
 
       $result->close();
@@ -24,13 +38,14 @@ switch ($request->method) {
       // Get all
       $products = [];
 
-      $sql = 'SELECT * FROM product 
-              JOIN price ON product.id = price.fk_product';
+      $sql = 'SELECT product.id, product.quantity, product.name, price.price 
+              FROM product LEFT JOIN price ON product.id = price.fk_product
+              WHERE product.deleted_at is NULL';
       $result = $conn->query($sql);
 
       while ($product = $result->fetch_object()) {
         if (isset($products[$product->id])) {
-          if($products[$product->id]->price_index <= $num_prices) {
+          if ($products[$product->id]->price_index <= $num_prices) {
             // Update price to the average
             $new_price = $products[$product->id]->price * $products[$product->id]->price_index;
             $products[$product->id]->price_index++;
@@ -39,13 +54,8 @@ switch ($request->method) {
           }
         } else {
           // Store product
-          $products[$product->id] = (object) [
-            'id' => $product->id,
-            'name' => $product->name,
-            'quantity' => $product->quantity,
-            'price' => $product->price,
-            'price_index' => 1, // Yeah, start at one
-          ];
+          $product->price_index = 1; // Yeah, start at one
+          $products[$product->id] = $product;
         }
       }
 
@@ -55,19 +65,61 @@ switch ($request->method) {
     break;
 
   case 'POST':
-        # code...
+
+    if(!is_valid($request)) exit();
+
+    $name = $conn->real_escape_string($request->name);
+    $quantity = isset($request->quantity) ? $conn->real_escape_string($request->quantity) : 0;
+    $type = isset($request->type) ? "'".$request->type."'" : 'NULL';
+
+    $sql = 'INSERT INTO product (name, quantity, type) VALUES ' . 
+            "('$name', $quantity, $type)";
+    $conn->query($sql);
+
+    //$product_id = $conn->insert_id;
+    //$price = $conn->real_escape_string($request->price);
+
+    //$sql = 'INSERT INTO price (price, fk_product) VALUES ' . 
+    //        "($price, $product_id)";
+    //$conn->query($sql);
+
+    apiResponse((object) ['product_id' => $conn->insert_id]);
     break;
 
   case 'PUT':
-        # code...
+  
+    if (!isset($request->id) || $request->id < 0)
+      apiResponse((object)['error' => 'Select one product']);
+    if(!is_valid($request)) exit();
+
+    $id = (int) $conn->real_escape_string($request->id);
+    $name = $conn->real_escape_string($request->name);
+    $quantity = isset($request->quantity) ? $conn->real_escape_string($request->quantity) : 0;
+    $type = isset($request->type) ? "'".$request->type."'" : 'NULL';
+
+    $sql = 'UPDATE product SET name = ' . "'$name'" . ' WHERE id = ' . $id . ';';
+    $sql .= 'UPDATE product SET quantity = ' . $quantity . ' WHERE id = ' . $id . ';';
+    $sql .= 'UPDATE product SET type = ' . $type . ' WHERE id = ' . $id . ';';
+    
+    $conn->multi_query($sql);
+
+    apiResponse((object) ['success' => true]);
     break;
 
-  case 'DELTE':
-        # code...
+  case 'DELETE':
+
+    if (!isset($request->id) || $request->id < 0)
+      apiResponse((object)['error' => 'Select one product']);
+
+    $id = (int) $conn->real_escape_string($request->id);
+    $sql = 'UPDATE product SET deleted_at = CURRENT_TIMESTAMP WHERE id = ' . $id; // $sql = 'DELETE FROM product WHERE product.id = ' . $id;
+    $conn->query($sql);
+
+    apiResponse((object) ['success' => true]);
     break;
 
   default:
-    apiResponse((object) ['error' => 'Ivalid method']);
+    apiResponse((object)['error' => 'Ivalid method']);
     break;
 }
 
