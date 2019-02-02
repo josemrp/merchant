@@ -1,4 +1,5 @@
-$(document).ready(() => {window['APP'] = new Vue({
+$(document).ready(() => {
+window['APP'] = new Vue({
   el: '#app',
   data: {
     products: [],
@@ -8,10 +9,17 @@ $(document).ready(() => {window['APP'] = new Vue({
       quantity: null,
       price: null
     },
-    typeAvailable: ['protein','carbohydrate','grease','vitamin']
+    typeAvailable: ['protein', 'carbohydrate', 'grease', 'vitamin']
   },
   methods: {
+    // --------
     // HTTP methods
+    // --------
+    /**
+     * Add a new into the database
+     * HTTP POST: create
+     * @requires this.$data.newProduct
+     */
     addProduct() {
       const data = this.$data.newProduct;
       $.ajax({
@@ -20,7 +28,7 @@ $(document).ready(() => {window['APP'] = new Vue({
         method: 'POST',
         data
       }).done(r => {
-        if(!r.error) {
+        if (!r.error) {
           const product = {
             id: r.product_id,
             name: data.name,
@@ -31,16 +39,85 @@ $(document).ready(() => {window['APP'] = new Vue({
         } else {
           console.error(r)
         }
+        $('#modal-add-product').modal('hide');
+        APP.$data.newProduct = {
+          name: null,
+          type: null,
+          quantity: null,
+          price: null
+        };
       })
     },
-    // Useful for the view
+    /**
+     * Update one product
+     * HTTP PUT: update
+     * @param {Number} productId
+     */
+    updateProduct(productId) {
+      if (this.$data.products.hasOwnProperty(productId)) {
+        const product = this.$data.products[productId];
+        if (product.quantity == '') {
+          product.quantity = 0;
+        }
+        const data = `?id=${product.id}&name=${product.name}&quantity=${product.quantity}`;
+        $.ajax({
+          url: './api/product.php' + data,
+          dataType: 'json',
+          method: 'PUT'
+        }).done(r => {
+          if (!r.error) {
+            console.log('Update: ' + (r.success ? 'suecces' : 'not success'));
+          } else {
+            // Bug: get the previous value
+            console.error(r)
+          }
+          APP.toggleCollapse(productId);
+        })
+      }
+    },
+    /**
+     * Delete one product
+     * HTTP DELETE: update
+     * @param {Number} productId 
+     */
+    daleteProduct(productId) {
+      if (this.$data.products.hasOwnProperty(productId)) {
+        const product = this.$data.products[productId];
+        const data = `?id=${product.id}`;
+        $.ajax({
+          url: './api/product.php' + data,
+          dataType: 'json',
+          method: 'DELETE'
+        }).done(r => {
+          if (!r.error) {
+            console.log('Delete: ' + (r.success ? 'suecces' : 'not success'));
+            delete APP.$data.products[productId];
+          } else {
+            console.error(r)
+          }
+          APP.toggleCollapse(productId);
+          // To fix the bug that not update the view
+          APP.$data.newProduct = {
+            name: null,
+            type: null,
+            quantity: null,
+            price: null
+          };
+        })
+      }
+    },
+
+    // --------
+    // Useful methods for the view
+    // --------
     /**
      * Hide all collapse and show the selected row
      * @param {Number} productId 
      */
     toggleCollapse(productId) {
       $('.collapse').collapse('hide');
-      $('#product-detail-'+productId).collapse('toggle');
+      $('#product-detail-' + productId).collapse('toggle');
+      // Get data in a backup
       // HTTP getOne
     },
     /**
@@ -51,7 +128,7 @@ $(document).ready(() => {window['APP'] = new Vue({
       for (const key in products) {
         if (products.hasOwnProperty(key)) {
           const product = products[key];
-          product.isCollapse = false;
+          // product.isCollapse = false; Don't used
           delete product.price_index;
         }
       }
@@ -59,14 +136,14 @@ $(document).ready(() => {window['APP'] = new Vue({
 
   },
   /**
-   * HTTP getAll
+   * HTTP GET: getAll
    */
   created() {
     $.ajax({
       url: './api/product.php',
       dataType: 'json',
     }).done(r => {
-      if(!r.error) {
+      if (!r.error) {
         APP.$data.products = r;
         APP.addAttributes();
       } else {
@@ -74,4 +151,5 @@ $(document).ready(() => {window['APP'] = new Vue({
       }
     })
   }
-})})
+})
+})
