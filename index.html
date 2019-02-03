@@ -47,6 +47,7 @@
           </div>
           <!-- Body -->
           <div v-for="(product, index) in products"
+            v-show="product.name.toLowerCase().includes(search)"
             :key="product.id"
             class="list-group-item list-group-item-action pointer"
             style="border-radius: 0">
@@ -141,6 +142,7 @@
           <div class="form-group">
             <input type="text"
               class="form-control"
+              v-model="search"
               placeholder="&#xf002; Search...">
           </div>
         </div>

@@ -9,7 +9,8 @@ const APP = new Vue({
       price: null,
       isLoading: false
     },
-    typeAvailable: ['protein', 'carbohydrate', 'grease', 'vitamin']
+    typeAvailable: ['protein', 'carbohydrate', 'grease', 'vitamin'],
+    search: ''
   },
   methods: {
     // --------
