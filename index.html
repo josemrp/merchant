@@ -162,8 +162,11 @@
                 Add new product
               </button>
               <div class="dropdown-divider"></div>
-              <button class="dropdown-item" type="button">Order by quantity</button>
-              <button class="dropdown-item" type="button">Order by price</button>
+              <button v-for="sortType in sortAvailable"
+                class="dropdown-item"
+                @click="sortBy(sortType)">
+                Order by {{ sortType }}
+              </button>
               <div class="dropdown-divider"></div>
               <button class="dropdown-item" type="button">Settings</button>
             </div>

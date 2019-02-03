@@ -10,7 +10,9 @@ const APP = new Vue({
       isLoading: false
     },
     typeAvailable: ['protein', 'carbohydrate', 'grease', 'vitamin'],
-    search: ''
+    search: '',
+    sortAvailable: ['quantity', 'price'],
+    currentSort: 'name'
   },
   methods: {
     // --------
@@ -56,6 +58,7 @@ const APP = new Vue({
             isCollapse: true,
             isLoading: true
           });
+          APP.sortBy(APP.$data.currentSort, false); // Insert in the correct order
         } else {
           console.error(r)
         }
@@ -116,7 +119,6 @@ const APP = new Vue({
         } else {
           console.error(r)
         }
-        //APP.toggleCollapse(index);
       })
     },
 
@@ -137,6 +139,36 @@ const APP = new Vue({
       } else {
         product.isCollapse = true;
         product.isLoading = true;
+      }
+    },
+    /**
+     * Sort the list by a custom argument
+     * @param {String} argument type of the sort
+     * @param {Boolean?} validate To jump validations when insert or firs sort
+     */
+    sortBy(argument, validate = true) {
+      const sortAvailable = this.$data.sortAvailable;
+      const products = this.$data.products;
+
+      if(!sortAvailable.includes(argument) && validate)
+        return;
+
+      sortAvailable.push(this.currentSort);
+      sortAvailable.splice(sortAvailable.indexOf(argument), 1);
+      this.currentSort = argument;
+
+      if(argument === 'name') {
+        // This is a string sort
+        products.sort((a,b) => {
+          if(a.name.toLowerCase() < b.name.toLowerCase())
+            return -1;
+          if(a.name.toLowerCase() > b.name.toLowerCase())
+            return 1;
+          return 0;
+        });
+      } else {
+        // All numeric sorts
+        products.sort((a,b) => a[argument] - b[argument]);
       }
     }
   },
@@ -164,6 +196,7 @@ const APP = new Vue({
             });
           }
         }
+        APP.sortBy(APP.$data.currentSort, false); // First sort
       } else {
         console.error(r)
       }
