@@ -7,8 +7,6 @@ sleep(1); // To simulte real work
 function is_valid($data) {
   if (!isset($data->name) || strlen($data->name) < 3)
     apiResponse((object)['error' => 'Specify the name, please']);
-  //if ($data->price < 0)
-  //  apiResponse((object)['error' => 'Invalid price']);
   if (strlen($data->name) > 30)
     apiResponse((object)['error' => 'The name can not have more than 30 characters']);
   if (isset($data->quantity) && $data->quantity < 0)
@@ -76,13 +74,6 @@ switch ($request->method) {
     $sql = 'INSERT INTO product (name, quantity, type) VALUES ' . 
             "('$name', $quantity, $type)";
     $conn->query($sql);
-
-    //$product_id = $conn->insert_id;
-    //$price = $conn->real_escape_string($request->price);
-
-    //$sql = 'INSERT INTO price (price, fk_product) VALUES ' . 
-    //        "($price, $product_id)";
-    //$conn->query($sql);
 
     apiResponse((object) ['product_id' => $conn->insert_id]);
     break;

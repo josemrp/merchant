@@ -4,12 +4,22 @@
 // if($_SESSION['login'] !== true)
 //     exit();
 
+/**
+ * Get data for the reques
+ * Get the method
+ */
 function getRequest() {
     $data = (object) $_REQUEST;
     $data->method = $_SERVER['REQUEST_METHOD'];
     return $data;
 }
 
+/**
+ * Response with JSON format
+ * And exit to the API
+ * 
+ * @param Object $data
+ */
 function apiResponse($data) {
     echo json_encode($data);
     if(isset($conn))
