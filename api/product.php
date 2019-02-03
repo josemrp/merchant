@@ -2,6 +2,8 @@
 
 require_once('functions.php');
 
+sleep(1); // To simulte real work
+
 function is_valid($data) {
   if (!isset($data->name) || strlen($data->name) < 3)
     apiResponse((object)['error' => 'Specify the name, please']);
@@ -22,15 +24,14 @@ switch ($request->method) {
   case 'GET':
     if (isset($request->id)) {
       // Get one
-      $sql = 'SELECT product.*, price.price, price.inserted_at AS price_inserted
-              FROM product LEFT JOIN price ON product.id = price.fk_product
-              WHERE product.id = ' . $conn->real_escape_string($request->id);
+      $sql = 'SELECT id, name, type, quantity FROM product
+              WHERE id = ' . $conn->real_escape_string($request->id) . ' AND 
+              deleted_at IS NULL';
       $result = $conn->query($sql);
 
-      $product = [];
-      while ($p = $result->fetch_object()) {
-        $product[] = $p;
-      }
+      $product = $result->num_rows > 0 ? 
+        $result->fetch_object() : 
+        (object) ['error' => 'Product not found'];
 
       $result->close();
       apiResponse($product);
@@ -40,7 +41,7 @@ switch ($request->method) {
 
       $sql = 'SELECT product.id, product.quantity, product.name, price.price 
               FROM product LEFT JOIN price ON product.id = price.fk_product
-              WHERE product.deleted_at is NULL';
+              WHERE product.deleted_at IS NULL';
       $result = $conn->query($sql);
 
       while ($product = $result->fetch_object()) {
