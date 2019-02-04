@@ -56,7 +56,7 @@
               @dblclick="toggleCollapse(index)">
               <div class="col-8 text-left">{{ product.name }}</div>
               <div class="col-2">{{ product.quantity }}</div>
-              <div class="col-2">{{ product.price }}</div>
+              <div class="col-2">{{ Math.floor(product.price * 100) / 100 }}</div>
             </div>
             <!-- Details -->
             <div class="row collapse" :id="'product-detail-'+product.id">
@@ -194,6 +194,14 @@
                     autofocus>
                 </div>
                 <div class="form-group">
+                  <label for="quantity" class="col-form-label">Quantity</label>
+                  <input type="number" 
+                    class="form-control" 
+                    v-model="newProduct.quantity"
+                    step=".25"
+                    placeholder="quantity">
+                </div>
+                <div class="form-group">
                   <label for="type" class="col-form-label">Type</label>
                   <select class="custom-select text-capitalize"
                     v-model="newProduct.type">
@@ -203,14 +211,6 @@
                       >{{ type }}
                     </option>
                   </select>
-                </div>
-                <div class="form-group">
-                  <label for="quantity" class="col-form-label">Quantity</label>
-                  <input type="number" 
-                    class="form-control" 
-                    v-model="newProduct.quantity"
-                    step=".25"
-                    placeholder="quantity">
                 </div>
                 <div class="form-group">
                   <label for="price" class="col-form-label">Price</label>

@@ -71,7 +71,6 @@ const APP = new Vue({
       this.$data.newProduct.isLoading = true;
       
       const data = this.$data.newProduct;
-
       $.ajax({
         url: './api/product.php',
         dataType: 'json',
@@ -82,6 +81,7 @@ const APP = new Vue({
         if (!r.error) {
           APP.$data.products.push({
             id: r.product_id,
+            price: data.price,
             name: data.name,
             quantity: data.quantity,
             isCollapse: true,
@@ -150,8 +150,17 @@ const APP = new Vue({
       if (product.quantity == '') {
         product.quantity = 0;
       }
+      if (product.type == 'null') {
+        product.type = null;
+      }
 
-      const data = `?id=${product.id}&name=${product.name}&quantity=${product.quantity}&type=${product.type}`;
+      var data = `?id=${product.id}`;
+      if(product.name)
+        data += `&name=${product.name}`;
+      if(product.quantity || product.quantity == 0)
+        data += `&quantity=${product.quantity}`;
+      if(product.type)
+        data += `&type=${product.type}`;
       
       // Update product data
       $.ajax({

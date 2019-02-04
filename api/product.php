@@ -9,7 +9,7 @@ function is_valid($data) {
     apiResponse((object)['error' => 'The name can not have more than 30 characters']);
   if (isset($data->quantity) && $data->quantity < 0)
     apiResponse((object)['error' => 'Invalid quantity']);
-  if(isset($data->type) && !in_array($data->type, ['protein','carbohydrate','grease','vitamin']))
+  if(isset($data->type) && ($data->type != '' || !in_array($data->type, ['protein','carbohydrate','grease','vitamin'])))
     apiResponse((object)['error' => 'The type must be '."'protein', 'carbohydrate', 'grease' or 'vitamin'"]);
   return true;
 }
@@ -64,8 +64,8 @@ switch ($request->method) {
     if(!is_valid($request)) exit();
 
     $name = $conn->real_escape_string($request->name);
-    $quantity = isset($request->quantity) ? $conn->real_escape_string($request->quantity) : 0;
-    $type = isset($request->type) ? "'".$request->type."'" : 'NULL';
+    $quantity = isset($request->quantity) && $request->quantity != '' ? $conn->real_escape_string($request->quantity) : 0;
+    $type = isset($request->type) && $request->type != '' ? "'".$request->type."'" : 'NULL';
 
     $sql = 'INSERT INTO product (name, quantity, type) VALUES ' . 
             "('$name', $quantity, $type)";
@@ -82,8 +82,8 @@ switch ($request->method) {
 
     $id = (int) $conn->real_escape_string($request->id);
     $name = $conn->real_escape_string($request->name);
-    $quantity = isset($request->quantity) ? $conn->real_escape_string($request->quantity) : 0;
-    $type = isset($request->type) ? "'".$request->type."'" : 'NULL';
+    $quantity = isset($request->quantity) && $request->quantity != '' ? $conn->real_escape_string($request->quantity) : 0;
+    $type = isset($request->type) && $request->type != '' ? "'".$request->type."'" : 'NULL';
 
     $sql = 'UPDATE product SET name = ' . "'$name'" . ' WHERE id = ' . $id . ';';
     $sql .= 'UPDATE product SET quantity = ' . $quantity . ' WHERE id = ' . $id . ';';
