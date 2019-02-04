@@ -81,6 +81,9 @@ const APP = new Vue({
       this.$data.newProduct.isLoading = true;
       
       const data = this.$data.newProduct;
+      if(data.type == 'null')
+        data.type = '';
+
       $.ajax({
         url: './api/product.php',
         dataType: 'json',
