@@ -9,7 +9,7 @@ function is_valid($data) {
     apiResponse((object)['error' => 'The name can not have more than 30 characters']);
   if (isset($data->quantity) && $data->quantity < 0)
     apiResponse((object)['error' => 'Invalid quantity']);
-  if(isset($data->type) && ($data->type != '' || !in_array($data->type, ['protein','carbohydrate','grease','vitamin'])))
+  if(isset($data->type) && !in_array($data->type, ['protein','carbohydrate','grease','vitamin']))
     apiResponse((object)['error' => 'The type must be '."'protein', 'carbohydrate', 'grease' or 'vitamin'"]);
   return true;
 }

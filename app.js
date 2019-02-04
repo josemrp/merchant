@@ -13,7 +13,11 @@ const APP = new Vue({
     typeAvailable: ['protein', 'carbohydrate', 'grease', 'vitamin'],
     search: '',
     sortAvailable: ['quantity', 'price'],
-    currentSort: 'name'
+    currentSort: 'name',
+    toast: {
+      class: '',
+      msg: ''
+    }
   },
   methods: {
     // --------
@@ -37,6 +41,7 @@ const APP = new Vue({
           product.quantity = r.quantity;
           product.type = r.type;
         } else {
+          APP.showToast({type: 'danger', msg: r.error});
           console.error(r)
         }
         product.isLoading = false;
@@ -56,6 +61,7 @@ const APP = new Vue({
         if (!r.error) {
           console.log(r);
         } else {
+          APP.showToast({type: 'danger', msg: r.error});
           console.error(r)
         }
         product.isLoading = false;
@@ -79,6 +85,8 @@ const APP = new Vue({
       }).done(r => {
         $('#modal-add-product').modal('hide');
         if (!r.error) {
+          APP.showToast({type: 'success', msg: 'Product added'});
+
           APP.$data.products.push({
             id: r.product_id,
             price: data.price,
@@ -95,6 +103,7 @@ const APP = new Vue({
 
           APP.sortBy(APP.$data.currentSort, false); // Insert in the correct order
         } else {
+          APP.showToast({type: 'danger', msg: r.error});
           console.error(r)
         }
         
@@ -133,6 +142,7 @@ const APP = new Vue({
             }
           }
         } else {
+          APP.showToast({type: 'danger', msg: r.error});
           console.error(r)
         }
       })
@@ -169,8 +179,9 @@ const APP = new Vue({
         method: 'PUT'
       }).done(r => {
         if (!r.error) {
-          console.log('Update: ' + (r.success ? 'suecces' : 'not success'));
+          APP.showToast({type: 'success', msg: 'Product updated'});
         } else {
+          APP.showToast({type: 'danger', msg: r.error});
           console.error(r);
           APP.getProduct(index)
         }
@@ -200,9 +211,10 @@ const APP = new Vue({
         method: 'DELETE'
       }).done(r => {
         if (!r.error) {
-          console.log('Delete: ' + (r.success ? 'suecces' : 'not success'));
+          APP.showToast({type: 'success', msg: 'Product deleted'});
           APP.$data.products.splice(index, 1);
         } else {
+          APP.showToast({type: 'danger', msg: r.error});
           console.error(r)
         }
       })
@@ -257,6 +269,31 @@ const APP = new Vue({
         // All numeric sorts
         products.sort((a,b) => a[argument] - b[argument]);
       }
+    },
+
+    /**
+     * Show the toast elemetn with a custom msg
+     * @param {String} type success or error
+     * @param {String} msg 
+     */
+    showToast({type, msg}) {
+      this.$data.toast.msg = msg;
+      this.$data.toast.class = 'alert-' + type;
+      $('#toast-custom-msg').fadeIn();
+      setTimeout(() => {
+        APP.hideToast();
+      }, 3000);
+    },
+
+    /**
+     * Hide toast element
+     */
+    hideToast() {
+      $('#toast-custom-msg').fadeOut();
+      setTimeout(() => {
+        APP.$data.toast.msg = '';
+        APP.$data.toast.class = '';
+      }, 300);
     }
   },
 
@@ -288,6 +325,6 @@ const APP = new Vue({
       } else {
         console.error(r)
       }
-    })
+    });
   }
 })
