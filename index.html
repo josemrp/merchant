@@ -50,23 +50,25 @@
             <div v-for="(product, index) in products"
               v-show="product.name.toLowerCase().includes(search)"
               :key="product.id"
-              class="list-group-item list-group-item-action pointer"
+              class="list-group-item list-group-item-action"
               style="border-radius: 0">
               <!-- Main -->
-              <div class="row"
-                @dblclick="toggleCollapse(index)">
+              <div class="row pointer"
+                @click="toggleCollapse(index)">
                 <div class="col-8 text-left">{{ product.name }}</div>
                 <div class="col-2">{{ product.quantity }}</div>
                 <div class="col-2">{{ Math.floor(product.price * 100) / 100 }}</div>
               </div>
               <!-- Details -->
               <div class="row collapse" :id="'product-detail-'+product.id">
+                <!-- Loading -->
                 <div v-show="product.isLoading"
                   class="col-12 text-center">
                   <div class="spinner-grow m-5" role="status">
                     <span class="sr-only">Loading...</span>
                   </div>
                 </div>
+                <!-- Form -->
                 <div v-show="!product.isLoading && !product.isCollapse"
                   class="col-12 text-left">
                   <form class="card card-body mt-2">
@@ -98,12 +100,43 @@
                     </div>
                     <hr>
                     <div class="form-group">
-                      <label for="prices" class="col-form-label">New Price</label>
-                      <input type="number"
-                        v-model="product.price"
-                        class="form-control">
+                      <label for="prices" class="col-form-label">Price</label>
+                      <div class="d-flex">
+                        <!-- Input -->
+                        <div class="flex-grow-1">
+                          <input v-if="!newPrice.isAdding"
+                            type="number"
+                            :value="Math.floor(product.price * 100) / 100"
+                            disabled
+                            class="form-control">
+                          <input v-else
+                            type="number"
+                            v-model="newPrice.value"
+                            class="form-control">
+                          <small class="form-text text-primary">
+                            <u class="pointer"
+                              @click="showGraph()">
+                              Show graph
+                            </u>
+                          </small>
+                        </div>
+                        <!-- Button -->
+                        <div class="dropup">
+                          <button v-if="!newPrice.isAdding"
+                            class="btn btn-link"
+                            @click.stop.prevent="newPrice = {isAdding: true, value: product.price}">
+                            New price
+                          </button>
+                          <button v-else
+                            class="btn btn-link"
+                            @click.stop.prevent="addPrice(product.id)">
+                            Add
+                          </button>
+                        </div>
+                      </div>                      
                     </div>
                   </form>
+                  <!-- Form Actions -->
                   <div class="d-flex justify-content-around">
                     <button @click="daleteProduct(index)"
                       class="btn btn-link text-danger">

@@ -3,6 +3,10 @@ const APP = new Vue({
   data: {
     products: [],
     prices: [],
+    newPrice: {
+      value: null,
+      isAdding: false
+    },
     newProduct: {
       name: null,
       type: null,
@@ -124,9 +128,12 @@ const APP = new Vue({
     /**
      * Insert a new price into database
      * @param {Number} productId 
-     * @param {Float} price 
+     * @requires this.$data.newPrice
      */
-    addPrice(productId, price) {
+    addPrice(productId) {
+      const price = this.$data.newPrice.value;
+      this.$data.newPrice.isAdding = false;
+
       $.ajax({
         url: './api/price.php',
         dataType: 'json',
@@ -137,6 +144,8 @@ const APP = new Vue({
           for (let i = 0; i < APP.$data.products.length; i++) {
             const product = APP.$data.products[i];
             if(product.id == productId) {
+              APP.showToast({type: 'success', msg: 'Price added successful'});
+              APP.$data.newPrice.value = null;
               product.price = r.newPrice;
               break;
             }
