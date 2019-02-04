@@ -2,6 +2,7 @@ const APP = new Vue({
   el: '#app',
   data: {
     products: [],
+    prices: [],
     newProduct: {
       name: null,
       type: null,
@@ -18,8 +19,15 @@ const APP = new Vue({
     // --------
     // HTTP methods
     // --------
+    /**
+     * Get data for the product
+     * HTTP GET: getOne
+     * @param {Number} index 
+     */
     getProduct(index) {
       const product = this.$data.products[index];
+
+      // Get product data
       $.ajax({
         url: './api/product.php?id=' + product.id,
         dataType: 'json',
@@ -34,14 +42,36 @@ const APP = new Vue({
         product.isLoading = false;
       })
     },
+
     /**
-     * Add a new into the database
+     * Get the prices for one product
+     * HTTP GET: getAll
+     * @param {Number} productId 
+     */
+    getPrices(productId) {
+      $.ajax({
+        url: './api/price.php?productId=' + productId,
+        dataType: 'json',
+      }).done(r => {
+        if (!r.error) {
+          console.log(r);
+        } else {
+          console.error(r)
+        }
+        product.isLoading = false;
+      })
+    },
+
+    /**
+     * Add a new product into the database
      * HTTP POST: create
      * @requires this.$data.newProduct
      */
     addProduct() {
       this.$data.newProduct.isLoading = true;
+      
       const data = this.$data.newProduct;
+
       $.ajax({
         url: './api/product.php',
         dataType: 'json',
@@ -53,15 +83,22 @@ const APP = new Vue({
           APP.$data.products.push({
             id: r.product_id,
             name: data.name,
-            // type: data.type,
             quantity: data.quantity,
             isCollapse: true,
             isLoading: true
           });
+
+          // Add new price
+          if(data.price && data.price > 0) {
+            this.addPrice(r.product_id, data.price);
+          }
+
           APP.sortBy(APP.$data.currentSort, false); // Insert in the correct order
         } else {
           console.error(r)
         }
+        
+        // Restore newProduct values before 300 ms
         setTimeout(() => {
           APP.$data.newProduct = {
             name: null,
@@ -71,8 +108,36 @@ const APP = new Vue({
             isLoading: false
           };
         }, 300);        
+      });
+
+    },
+
+    /**
+     * Insert a new price into database
+     * @param {Number} productId 
+     * @param {Float} price 
+     */
+    addPrice(productId, price) {
+      $.ajax({
+        url: './api/price.php',
+        dataType: 'json',
+        method: 'POST',
+        data: {productId, price}
+      }).done(r => {        
+        if (!r.error) {
+          for (let i = 0; i < APP.$data.products.length; i++) {
+            const product = APP.$data.products[i];
+            if(product.id == productId) {
+              product.price = r.newPrice;
+              break;
+            }
+          }
+        } else {
+          console.error(r)
+        }
       })
     },
+
     /**
      * Update one product
      * HTTP PUT: update
@@ -81,10 +146,14 @@ const APP = new Vue({
     updateProduct(index) {
       const product = this.$data.products[index];
       product.isLoading = true;
+
       if (product.quantity == '') {
         product.quantity = 0;
       }
+
       const data = `?id=${product.id}&name=${product.name}&quantity=${product.quantity}&type=${product.type}`;
+      
+      // Update product data
       $.ajax({
         url: './api/product.php' + data,
         dataType: 'json',
@@ -97,17 +166,25 @@ const APP = new Vue({
           APP.getProduct(index)
         }
         APP.toggleCollapse(index);
-      })
+      });
+
+      // Add new price
+      if(product.price && product.price > 0) {
+        this.addPrice(product.id, product.price);
+      }
     },
+
     /**
      * Delete one product
      * HTTP DELETE: update
      * @param {Number} index 
      */
     daleteProduct(index) {
+      
       const product = this.$data.products[index];
-      product.isLoading = true;
       const data = `?id=${product.id}`;
+      product.isLoading = true;
+      
       $.ajax({
         url: './api/product.php' + data,
         dataType: 'json',
@@ -141,6 +218,7 @@ const APP = new Vue({
         product.isLoading = true;
       }
     },
+
     /**
      * Sort the list by a custom argument
      * @param {String} argument type of the sort
@@ -172,6 +250,7 @@ const APP = new Vue({
       }
     }
   },
+
   /**
    * Get the data and add useful vars
    * HTTP GET: getAll

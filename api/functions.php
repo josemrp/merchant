@@ -1,5 +1,9 @@
 <?php 
 
+// Config
+$NUM_PRICES = 5;
+sleep(1); // To simulte real work
+
 // session_start();
 // if($_SESSION['login'] !== true)
 //     exit();

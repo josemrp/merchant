@@ -96,6 +96,13 @@
                         </option>
                       </select>
                     </div>
+                    <hr>
+                    <div class="form-group">
+                      <label for="prices" class="col-form-label">New Price</label>
+                      <input type="number" 
+                        v-model="product.price"
+                        class="form-control">
+                    </div>
                   </form>
                   <div class="d-flex justify-content-around">
                     <button @click="daleteProduct(index)"
@@ -115,25 +122,6 @@
             </div>
           </div>
         </div>
-        <!--
-        <table class="table table-hover table-borderless">
-          <thead class="thead-dark">
-            <tr>
-              <th class="">Products</th>
-              <th class="text-center">#</th>
-              <th class="text-center">$</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="product in products"
-              ::key="product.id">
-              <td>{{ product.name }}</td>
-              <td class="text-center">{{ product.quantity }}</td>
-              <td class="text-center">{{ Math.floor(product.price * 100) / 100
-                }}</td>
-            </tr>
-          </tbody>
-        </table><!-- -->
       </div>
       <!-- Actions -->
       <div class="row">
@@ -148,10 +136,11 @@
         </div>
         <!-- Action buttons -->
         <div class="col-2 text-center">
-          <div class="btn-group dropup">
+          <div class="dropup">
             <button type="button" class="btn btn-secondary"
-              style="border-radius: .25rem"
-              data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              data-toggle="dropdown" 
+              aria-haspopup="true" 
+              aria-expanded="false">
               <i class="fas fa-ellipsis-v"></i>
             </button>
             <div class="dropdown-menu dropdown-menu-right">

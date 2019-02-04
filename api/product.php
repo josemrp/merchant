@@ -2,8 +2,6 @@
 
 require_once('functions.php');
 
-sleep(1); // To simulte real work
-
 function is_valid($data) {
   if (!isset($data->name) || strlen($data->name) < 3)
     apiResponse((object)['error' => 'Specify the name, please']);
@@ -15,8 +13,6 @@ function is_valid($data) {
     apiResponse((object)['error' => 'The type must be '."'protein', 'carbohydrate', 'grease' or 'vitamin'"]);
   return true;
 }
-
-$num_prices = 5;
 
 switch ($request->method) {
   case 'GET':
@@ -41,10 +37,10 @@ switch ($request->method) {
               FROM product LEFT JOIN price ON product.id = price.fk_product
               WHERE product.deleted_at IS NULL';
       $result = $conn->query($sql);
-
+      
       while ($product = $result->fetch_object()) {
         if (isset($products[$product->id])) {
-          if ($products[$product->id]->price_index <= $num_prices) {
+          if ($products[$product->id]->price_index <= $NUM_PRICES) {
             // Update price to the average
             $new_price = $products[$product->id]->price * $products[$product->id]->price_index;
             $products[$product->id]->price_index++;

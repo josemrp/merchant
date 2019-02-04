@@ -9,9 +9,8 @@ switch ($request->method) {
 
     $sql = 'SELECT id, price, inserted_at FROM price
             WHERE fk_product = ' . $conn->real_escape_string($request->productId);
-
     $result = $conn->query($sql);
-
+    
     if($result->num_rows < 1) 
       apiResponse(['error' => 'Product not found']);
     
@@ -33,12 +32,30 @@ switch ($request->method) {
       apiResponse(['error' => 'Invalid price']);
 
     $productId = (int) $conn->real_escape_string($request->productId);
-    $price = $conn->real_escape_string($request->price);
+    $price = (float) $conn->real_escape_string($request->price);
 
     $sql = 'INSERT INTO price (price, fk_product) VALUES ' . "($price, $productId)";
     $conn->query($sql);
 
-    apiResponse(['success' => true]);
+    // Get new avg(price)
+    $sql = 'SELECT price FROM price
+            WHERE fk_product = ' . $productId;
+    $result = $conn->query($sql);
+    
+    $prices = 0;
+    $index = 0;
+    while ($price = $result->fetch_object()) {
+      $prices += $price->price;
+      $index++;
+    }
+
+    $result->close();
+
+    if($index)
+      apiResponse(['newPrice' => ($prices/$index)]);
+    else
+      apiResponse(['error' => 'Price not inserted']);
+
     break;
 }
 
