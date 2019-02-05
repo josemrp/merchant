@@ -21,7 +21,15 @@ const APP = new Vue({
     toast: {
       class: '',
       msg: ''
-    }
+    },
+    icons: ['fas fa-bong','fas fa-bicycle','fas fa-bell','fab fa-bitcoin',
+      'fas fa-bread-slice','fas fa-box','fas fa-broom','fas fa-car-side',
+      'fas fa-chart-area','fas fa-chart-bar','far fa-chart-bar',
+      'fas fa-chart-line','fas fa-child','fas fa-clipboard-list',
+      'fas fa-cookie-bite','fas fa-dog','fas fa-flushed','far fa-frown-open',
+      'fab fa-github','fas fa-globe-americas','far fa-grin-beam-sweat',
+      'far fa-meh-rolling-eyes','fas fa-mug-hot'
+    ]
   },
   methods: {
     // --------
@@ -306,6 +314,10 @@ const APP = new Vue({
         APP.$data.toast.msg = '';
         APP.$data.toast.class = '';
       }, 300);
+    },
+
+    showGraph() {
+
     }
   },
 

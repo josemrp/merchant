@@ -41,7 +41,7 @@ switch ($request->method) {
       while ($product = $result->fetch_object()) {
         
         if (isset($products[$product->id])) {
-          // Add new price
+          // Add other price
           $products[$product->id]->dates[] = strtotime($product->inserted_at);
           $products[$product->id]->prices[] = (float) $product->price;
         } else {

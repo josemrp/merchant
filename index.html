@@ -115,6 +115,8 @@
                             class="form-control">
                           <small class="form-text text-primary">
                             <u class="pointer"
+                              data-toggle="modal"
+                              data-target="#modal-graph"
                               @click="showGraph()">
                               Show graph
                             </u>
@@ -262,6 +264,39 @@
               <button type="button" class="btn btn-primary"
                 @click="addProduct()">
                 Add
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Modal Graph -->
+      <div class="modal fade" id="modal-graph" tabindex="-1"
+        role="dialog" aria-labelledby="modal-graph-title"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="modal-graph-title">
+                Graph
+              </h5>
+              <button type="button" class="close" data-dismiss="modal"
+                aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body text-center">
+              <i>Coming soon</i>
+              <div class="m-2">
+                <i class="fa-7x"
+                  :class="icons[Math.floor(Math.random() * icons.length)]"
+                ></i>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" 
+                class="btn btn-secondary"
+                data-dismiss="modal">
+                Close
               </button>
             </div>
           </div>
