@@ -98,9 +98,8 @@ const APP = new Vue({
         method: 'POST',
         data
       }).done(r => {
-        $('#modal-add-product').modal('hide');
-        if (!r.error) {
-          APP.showToast({type: 'success', msg: 'Product added'});
+        if (!r.error && r.product_id > 0) {
+          APP.showToast({type: 'success', msg: 'Product added successful'});
 
           APP.$data.products.push({
             id: r.product_id,
@@ -120,8 +119,12 @@ const APP = new Vue({
         } else {
           APP.showToast({type: 'danger', msg: r.error});
           console.error(r)
-        }
-        
+        }       
+      }).fail(r => {
+        APP.showToast({type: 'danger', msg: 'Internal server error'});
+        console.error(r)
+      }).always(() => {
+        $('#modal-add-product').modal('hide');  
         // Restore newProduct values before 300 ms
         setTimeout(() => {
           APP.$data.newProduct = {
@@ -131,9 +134,8 @@ const APP = new Vue({
             price: null,
             isLoading: false
           };
-        }, 300);        
-      });
-
+        }, 300); 
+      })
     },
 
     /**
@@ -150,13 +152,12 @@ const APP = new Vue({
         dataType: 'json',
         method: 'POST',
         data: {productId, price}
-      }).done(r => {   
+      }).done(r => {
         if (!r.error) {
           for (let i = 0; i < APP.$data.products.length; i++) {
             const product = APP.$data.products[i];
             if(product.id == productId) {
               APP.showToast({type: 'success', msg: 'Price added successful'});
-              APP.$data.newPrice.value = null;
               product.price = r.newPrice;
               break;
             }
@@ -165,6 +166,11 @@ const APP = new Vue({
           APP.showToast({type: 'danger', msg: r.error});
           console.error(r)
         }
+      }).fail(r => {
+        APP.showToast({type: 'danger', msg: 'Internal server error'});
+        console.error(r)
+      }).always(() => {
+        APP.$data.newPrice.value = null;
       })
     },
 
@@ -199,19 +205,20 @@ const APP = new Vue({
         method: 'PUT'
       }).done(r => {
         if (!r.error) {
-          APP.showToast({type: 'success', msg: 'Product updated'});
+          APP.showToast({type: 'success', msg: 'Product updated successful'});
         } else {
           APP.showToast({type: 'danger', msg: r.error});
           console.error(r);
           APP.getProduct(index)
-        }
+        }        
+      }).fail(r => {
+        APP.showToast({type: 'danger', msg: 'Internal server error'});
+        APP.getProduct(index)
+        console.error(r)
+      }).always(() => {
         APP.toggleCollapse(index);
-      });
-
-      // Add new price
-      if(product.price && product.price > 0) {
-        this.addPrice(product.id, product.price);
-      }
+        APP.$data.newPrice.value = null;
+      })
     },
 
     /**
@@ -237,6 +244,9 @@ const APP = new Vue({
           APP.showToast({type: 'danger', msg: r.error});
           console.error(r)
         }
+      }).fail(r => {
+        APP.showToast({type: 'danger', msg: 'Internal server error'});
+        console.error(r)
       })
     },
 
@@ -371,6 +381,9 @@ const APP = new Vue({
       } else {
         console.error(r)
       }
-    });
+    }).fail(r => {
+      APP.showToast({type: 'danger', msg: 'Internal server error. Come back in 5 min'});
+      console.error(r);
+    })
   }
 })
