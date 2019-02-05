@@ -3,9 +3,9 @@
 // Config
 sleep(1); // To simulte real work
 
-// session_start();
-// if($_SESSION['login'] !== true)
-//     exit();
+session_start();
+if ($_SESSION['login'] !== true)
+  exit('Not login');
 
 require_once('linearRegression.php');
 
@@ -13,10 +13,11 @@ require_once('linearRegression.php');
  * Get data for the reques
  * Get the method
  */
-function getRequest() {
-    $data = (object) $_REQUEST;
-    $data->method = $_SERVER['REQUEST_METHOD'];
-    return $data;
+function getRequest()
+{
+  $data = (object)$_REQUEST;
+  $data->method = $_SERVER['REQUEST_METHOD'];
+  return $data;
 }
 
 /**
@@ -25,18 +26,19 @@ function getRequest() {
  * 
  * @param Object $data
  */
-function apiResponse($data) {
-    echo json_encode($data);
-    if(isset($conn))
-        $conn->close();
-    exit();
+function apiResponse($data)
+{
+  echo json_encode($data);
+  if (isset($conn))
+    $conn->close();
+  exit();
 }
 
 $request = getRequest();
 $conn = new mysqli('localhost', 'root', '', 'db_merchant');
 
-if($conn->connect_errno) {
-    apiResponse((object) ['error' => $conn->connect_error]);
+if ($conn->connect_errno) {
+  apiResponse((object)['error' => $conn->connect_error]);
 }
 
 ?>

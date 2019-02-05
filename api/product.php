@@ -74,6 +74,10 @@ switch ($request->method) {
             "('$name', $quantity, $type)";
     $conn->query($sql);
 
+    $id = $conn->insert_id;
+    if($id == 0)
+      apiResponse(['error' => 'This product already exists']);
+
     apiResponse((object) ['product_id' => $conn->insert_id]);
     break;
 
