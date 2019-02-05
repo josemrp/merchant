@@ -33,28 +33,31 @@ switch ($request->method) {
       // Get all
       $products = [];
 
-      $sql = 'SELECT product.id, product.quantity, product.name, price.price 
+      $sql = 'SELECT product.id, product.quantity, product.name, price.price, price.inserted_at
               FROM product LEFT JOIN price ON product.id = price.fk_product
               WHERE product.deleted_at IS NULL';
       $result = $conn->query($sql);
       
       while ($product = $result->fetch_object()) {
+        
         if (isset($products[$product->id])) {
-          if ($products[$product->id]->price_index <= $NUM_PRICES) {
-            // Update price to the average
-            $new_price = $products[$product->id]->price * $products[$product->id]->price_index;
-            $products[$product->id]->price_index++;
-            $new_price = ($new_price + $product->price) / $products[$product->id]->price_index;
-            $products[$product->id]->price = $new_price;
-          }
+          // Add new price
+          $products[$product->id]->dates[] = strtotime($product->inserted_at);
+          $products[$product->id]->prices[] = (float) $product->price;
         } else {
           // Store product
-          $product->price_index = 1; // Yeah, start at one
           $products[$product->id] = $product;
+          $products[$product->id]->dates = [strtotime($product->inserted_at)];
+          $products[$product->id]->prices = [(float) $product->price];
         }
       }
-
       $result->close();
+
+      foreach ($products as &$product) {
+        $product->price = linearRegression($product->dates, $product->prices, time());
+        unset($product->dates, $product->prices);
+      }
+      
       apiResponse($products);
     }
     break;

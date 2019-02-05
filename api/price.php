@@ -38,21 +38,21 @@ switch ($request->method) {
     $conn->query($sql);
 
     // Get new avg(price)
-    $sql = 'SELECT price FROM price
+    $sql = 'SELECT price, inserted_at FROM price
             WHERE fk_product = ' . $productId;
     $result = $conn->query($sql);
     
-    $prices = 0;
-    $index = 0;
-    while ($price = $result->fetch_object()) {
-      $prices += $price->price;
-      $index++;
+    $prices = [];
+    $dates = [];
+    while ($row = $result->fetch_object()) {
+      $dates[] = strtotime($row->inserted_at);
+      $prices[] = (float) $row->price;
     }
 
     $result->close();
 
-    if($index)
-      apiResponse(['newPrice' => ($prices/$index)]);
+    if(count($prices))
+      apiResponse(['newPrice' => linearRegression($dates, $prices, time())]);
     else
       apiResponse(['error' => 'Price not inserted']);
 

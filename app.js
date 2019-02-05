@@ -142,7 +142,7 @@ const APP = new Vue({
         dataType: 'json',
         method: 'POST',
         data: {productId, price}
-      }).done(r => {        
+      }).done(r => {   
         if (!r.error) {
           for (let i = 0; i < APP.$data.products.length; i++) {
             const product = APP.$data.products[i];
