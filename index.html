@@ -75,6 +75,7 @@
                     <div class="form-group">
                       <label for="name" class="col-form-label">Name</label>
                       <input type="text"
+                        :id="'focusEditName-'+product.id"
                         class="form-control"
                         v-model="product.name"
                         placeholder="Name">
@@ -104,13 +105,15 @@
                       <div class="d-flex">
                         <!-- Input -->
                         <div class="flex-grow-1">
-                          <input v-if="!newPrice.isAdding"
+                          <input v-show="!newPrice.isAdding"
                             type="number"
                             :value="Math.floor(product.price * 100) / 100"
                             disabled
                             class="form-control">
-                          <input v-else
+                          <input v-show="newPrice.isAdding"
                             type="number"
+                            :id="'focusProductPrice-'+product.id"
+                            @blur="newPrice.isAdding = false"
                             v-model="newPrice.value"
                             class="form-control">
                           <small class="form-text text-primary">
@@ -124,12 +127,12 @@
                         </div>
                         <!-- Button -->
                         <div class="dropup">
-                          <button v-if="!newPrice.isAdding"
+                          <button v-show="!newPrice.isAdding"
                             class="btn btn-link"
-                            @click.stop.prevent="newPrice = {isAdding: true, value: product.price}">
+                            @click.stop.prevent="enableAddPrice(index)">
                             New price
                           </button>
-                          <button v-else
+                          <button v-show="newPrice.isAdding"
                             class="btn btn-link"
                             @click.stop.prevent="addPrice(product.id)">
                             Add
@@ -167,7 +170,7 @@
             <input type="text"
               class="form-control"
               v-model="search"
-              placeholder="&#xf002; Search...">
+              placeholder="Search">
           </div>
         </div>
         <!-- Action buttons -->
@@ -181,6 +184,7 @@
             </button>
             <div class="dropdown-menu dropdown-menu-right">
               <button class="dropdown-item text-primary"
+                onclick="setTimeout(() => {$('#focusNewProduct').focus()}, 600)"
                 type="button"
                 data-toggle="modal"
                 data-target="#modal-add-product">
@@ -226,10 +230,10 @@
                 <div class="form-group">
                   <label for="name" class="col-form-label">Name</label>
                   <input type="text"
+                    id='focusNewProduct'
                     class="form-control"
                     v-model="newProduct.name"
-                    placeholder="Name"
-                    autofocus>
+                    placeholder="Name">
                 </div>
                 <div class="form-group">
                   <label for="quantity" class="col-form-label">Quantity</label>

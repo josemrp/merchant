@@ -248,12 +248,22 @@ const APP = new Vue({
      * @param {Number} index 
      */
     toggleCollapse(index) {
+
       $('.collapse').collapse('hide');
       const product = this.$data.products[index];
+
       if(product.isCollapse) {
         product.isCollapse = false;
         this.getProduct(index);
         $('#product-detail-' + product.id).collapse('show');
+
+        const focusEditInterval = setInterval(() => {
+          if(product.isLoading === false) {
+            clearInterval(focusEditInterval);
+            $('#focusEditName-'+product.id).focus();
+          }
+        }, 200);
+
       } else {
         product.isCollapse = true;
         product.isLoading = true;
@@ -318,6 +328,18 @@ const APP = new Vue({
 
     showGraph() {
 
+    },
+
+    /**
+     * Enable input to add a new price
+     * @param {Number} index 
+     */
+    enableAddPrice(index) {
+      const product = this.$data.products[index];
+      this.$data.newPrice = {isAdding: true, value: product.price};
+      this.$nextTick(() => {
+        $('#focusProductPrice-'+product.id).focus()
+      })
     }
   },
 
