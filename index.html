@@ -38,12 +38,12 @@
         <div class="row">
           <div class="list-group w-100 text-center">
             <!-- Header -->
-            <header class="list-group-item list-group-item-primary"
+            <header class="list-group-item active font-weight-bold"
               style="border-radius: 0">
               <div class="row">
-                <div class="col-8 text-left">Product</div>
+                <div class="col-7 text-left">Product</div>
                 <div class="col-2">#</div>
-                <div class="col-2">$</div>
+                <div class="col-3">$</div>
               </div>
             </header>
             <!-- Body -->
@@ -55,9 +55,9 @@
               <!-- Main -->
               <div class="row pointer"
                 @click="toggleCollapse(index)">
-                <div class="col-8 text-left">{{ product.name }}</div>
+                <div class="col-7 text-left">{{ product.name }}</div>
                 <div class="col-2">{{ product.quantity }}</div>
-                <div class="col-2">{{ Math.floor(product.price * 100) / 100 }}</div>
+                <div class="col-3">{{ Math.floor(product.price * 100) / 100 }}</div>
               </div>
               <!-- Details -->
               <div class="row collapse" :id="'product-detail-'+product.id">
@@ -86,7 +86,7 @@
                         class="form-control"
                         v-model="product.quantity"
                         step=".25"
-                        placeholder="quantity">
+                        placeholder="Quantity">
                     </div>
                     <div class="form-group">
                       <label for="type" class="col-form-label">Type</label>
@@ -113,16 +113,17 @@
                           <input v-show="newPrice.isAdding"
                             type="number"
                             :id="'focusProductPrice-'+product.id"
-                            @blur="newPrice.isAdding = false"
+                            onblur="setTimeout(() => {APP.newPrice.isAdding = false}, 300)"
                             v-model="newPrice.value"
-                            class="form-control">
+                            class="form-control"
+                            placeholder="Price">
                           <small class="form-text text-primary">
-                            <u class="pointer"
+                            <span class="btn-link pointer"
                               data-toggle="modal"
                               data-target="#modal-graph"
                               @click="showGraph()">
                               Show graph
-                            </u>
+                            </span>
                           </small>
                         </div>
                         <!-- Button -->
@@ -149,7 +150,7 @@
                     </button>
                     <button @click="toggleCollapse(index)"
                       class="btn btn-link text-secondary">
-                      Cancel
+                      Close
                     </button>
                     <button @click="updateProduct(index)"
                       class="btn btn-link text-primary">
@@ -176,14 +177,14 @@
         <!-- Action buttons -->
         <div class="m-2">
           <div class="dropup">
-            <button type="button" class="btn btn-secondary"
+            <button type="button" class="btn btn-primary"
               data-toggle="dropdown"
               aria-haspopup="true"
               aria-expanded="false">
               <i class="fas fa-ellipsis-v"></i>
             </button>
             <div class="dropdown-menu dropdown-menu-right">
-              <button class="dropdown-item text-primary"
+              <button class="dropdown-item text-primary bg-white pointer"
                 onclick="setTimeout(() => {$('#focusNewProduct').focus()}, 600)"
                 type="button"
                 data-toggle="modal"
@@ -192,12 +193,12 @@
               </button>
               <div class="dropdown-divider"></div>
               <button v-for="sortType in sortAvailable"
-                class="dropdown-item"
+                class="dropdown-item pointer"
                 @click="sortBy(sortType)">
                 Order by {{ sortType }}
               </button>
               <div class="dropdown-divider"></div>
-              <button class="dropdown-item" type="button">Settings</button>
+              <button class="dropdown-item disabled" type="button">Settings</button>
             </div>
           </div>
         </div>
@@ -241,7 +242,7 @@
                     class="form-control"
                     v-model="newProduct.quantity"
                     step=".25"
-                    placeholder="quantity">
+                    placeholder="Quantity">
                 </div>
                 <div class="form-group">
                   <label for="type" class="col-form-label">Type</label>
@@ -258,7 +259,7 @@
                   <input type="number"
                     class="form-control"
                     v-model="newProduct.price"
-                    placeholder="price">
+                    placeholder="Price">
                 </div>
               </form>
             </div>
