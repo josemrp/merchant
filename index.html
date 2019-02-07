@@ -48,7 +48,7 @@
             </header>
             <!-- Body -->
             <div v-for="(product, index) in products"
-              v-show="product.name.toLowerCase().includes(search)"
+              v-show="product.name.toLowerCase().includes(search.toLowerCase())"
               :key="product.id"
               class="list-group-item list-group-item-action"
               style="border-radius: 0">

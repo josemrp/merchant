@@ -112,7 +112,8 @@ const APP = new Vue({
 
           // Add new price
           if(data.price && data.price > 0) {
-            this.addPrice(r.product_id, data.price);
+            APP.$data.newPrice.value = data.price;
+            APP.addPrice(r.product_id);
           }
 
           APP.sortBy(APP.$data.currentSort, false); // Insert in the correct order
@@ -134,7 +135,7 @@ const APP = new Vue({
             price: null,
             isLoading: false
           };
-        }, 300); 
+        }, 1000);
       })
     },
 
@@ -270,7 +271,7 @@ const APP = new Vue({
         const focusEditInterval = setInterval(() => {
           if(product.isLoading === false) {
             clearInterval(focusEditInterval);
-            $('#focusEditName-'+product.id).focus();
+            // $('#focusEditName-'+product.id).focus(); Es molesto en telefonos
           }
         }, 200);
 
